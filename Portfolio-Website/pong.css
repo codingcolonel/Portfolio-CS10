@@ -1,0 +1,15 @@
+body{
+  text-align: center;
+}
+
+canvas{
+  border: 1px solid gray;
+  margin-bottom: 0;
+}
+
+p{
+  font-size: 100px;
+  font-family: monospace;
+  font-weight: bold;
+  margin-top: 50px
+}
