@@ -32,6 +32,9 @@ var ranNum
 var groundCheck2 = true
 var enemyCheck = true
 var inEnemy = false
+var timesLeftClicked = 0
+var timesRightClicked = 0
+var dashing = false
 
 var player = {
   x: 375,
@@ -81,7 +84,7 @@ function deltaTime() {
 
 function update() {
   // UPDATE ELEMENTS ON CANVAS
-  if (player.y < ground) {
+  if (player.y < ground && dashing === false) {
     player.gravityspeed += player.gravity
     player.yvelocity += player.gravityspeed
   }
@@ -100,7 +103,7 @@ function update() {
   // console.log("py " + player.y)
   // console.log("px " + player.x)
   // console.log("yv " + player.yvelocity)
-  // console.log("xv " + player.xvelocity)
+  console.log("xv " + player.xvelocity)
   // console.log("gv " + player.gravityspeed)
   // console.log("dr " + directionRight)
   // console.log("dl " + directionLeft)
@@ -117,6 +120,7 @@ function update() {
   // console.log("exv " + enemy.xvelocity)
   // console.log("egv " + enemy.gravityspeed)
   // console.log("ec " + enemyCheck)
+  console.log("dash" + dashing)
 }
 
 function draw() {
@@ -250,7 +254,7 @@ function physics() {
   }
   // RESET Y VELOCITY + GRAVITY
   if (player.y === ground && groundCheck === true) {
-    if (directionLeft === false && directionRight === false) {
+    if (directionLeft === false && directionRight === false && dashing === false) {
       player.xvelocity = 0
     }
     player.gravityspeed = 0
@@ -429,17 +433,48 @@ function keydownHandler(event) {
     walljump = true
   }
   // X MOVEMENT
-  if (!event.repeat) {
+  if (!event.repeat && dashing === false) {
     if (event.code === "ArrowRight" && player.x < 750) {
+      timesRightClicked++
       player.xvelocity = 5
       directionRight = true
       rightIsHeld = true
+      if(timesRightClicked >= 2) {
+        console.log("doubleR")
+        dashing = true
+        player.xvelocity = 100
+        setTimeout(function resetRSpeed() {
+          dashing = false
+          if (rightIsHeld === true) {
+            player.xvelocity = 5
+          } else {
+            player.xvelocity = 0
+          }
+        }, 1000)
+      }
     }
     if (event.code === "ArrowLeft" && player.x > 0) {
+      timesLeftClicked++
       player.xvelocity = -5
       directionLeft = true
       leftIsHeld = true
+      if(timesLeftClicked >= 2) {
+        console.log("doubleL")
+        dashing = true
+        player.xvelocity = -100
+        gravityspeed = 0
+        setTimeout(function resetLSpeed() {
+          dashing = false
+          if (leftIsHeld === true) {
+            player.xvelocity = -5
+          } else {
+            player.xvelocity = 0
+          }
+        }, 1000)
+      }
     }
+    setTimeout(() => (timesLeftClicked = 0), 200)
+    setTimeout(() => (timesRightClicked = 0), 200)
   }
   // FALL THROUGH PLATFORM
   if (event.code === "ArrowDown") {
@@ -467,6 +502,7 @@ function keyupHandler(event) {
     downIsHeld = false
   }
 }
+
 
 function aiEnemy() {
   // UPDATE AI ELEMENTS
