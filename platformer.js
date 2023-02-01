@@ -316,6 +316,7 @@ function physics() {
     player.yvelocity = 0
   }
 
+  if(dashing === false) {
   if (directionLeft === true && player.x !== 0) {
     player.xvelocity = -5
   } else if (directionRight === true && player.x !== 750) {
@@ -323,7 +324,7 @@ function physics() {
   } else if (player.y === ground || onspikes === true) {
     player.xvelocity = 0
   }
-
+  }
   // SPIKES COLLISION
   if (player.x > 265 && player.x < 485 && player.y > 224 && player.y <= 250) {
     player.y = 225
@@ -433,53 +434,61 @@ function keydownHandler(event) {
     walljump = true
   }
   // X MOVEMENT
-  if (!event.repeat && dashing === false) {
-    if (event.code === "ArrowRight" && player.x < 750) {
+  if (!event.repeat) {
+    if (event.code === "ArrowRight" && player.x < 750  && dashing === false) {
       timesRightClicked++
       player.xvelocity = 5
       directionRight = true
       rightIsHeld = true
-      if(timesRightClicked >= 2) {
-        console.log("doubleR")
-        dashing = true
-        player.xvelocity = 100
-        setTimeout(function resetRSpeed() {
-          dashing = false
-          if (rightIsHeld === true) {
-            player.xvelocity = 5
-          } else {
-            player.xvelocity = 0
-          }
-        }, 1000)
-      }
     }
-    if (event.code === "ArrowLeft" && player.x > 0) {
+    if (event.code === "ArrowLeft" && player.x > 0  && dashing === false) {
       timesLeftClicked++
       player.xvelocity = -5
       directionLeft = true
       leftIsHeld = true
-      if(timesLeftClicked >= 2) {
-        console.log("doubleL")
-        dashing = true
-        player.xvelocity = -100
-        gravityspeed = 0
-        setTimeout(function resetLSpeed() {
-          dashing = false
-          if (leftIsHeld === true) {
-            player.xvelocity = -5
-          } else {
-            player.xvelocity = 0
-          }
-        }, 1000)
       }
+
+    // DASH
+    if(timesRightClicked >= 2) {
+      console.log("doubleR")
+      dashing = true
+      player.xvelocity = 15
+      player.gravityspeed = 0
+      player.yvelocity = 0
+      setTimeout(function resetRSpeed() {
+        dashing = false
+        if (rightIsHeld === true) {
+          player.xvelocity = 5
+        } else {
+          player.xvelocity = 0
+        }
+      }, 200)
     }
-    setTimeout(() => (timesLeftClicked = 0), 200)
-    setTimeout(() => (timesRightClicked = 0), 200)
+
+    if(timesLeftClicked >= 2) {
+      console.log("doubleL")
+      dashing = true
+      player.xvelocity = -15
+      player.gravityspeed = 0
+      player.yvelocity = 0
+      setTimeout(function resetLSpeed() {
+        dashing = false
+        if (leftIsHeld === true) {
+          player.xvelocity = -5
+        } else {
+          player.xvelocity = 0
+        }
+      }, 200)
   }
+
+  setTimeout(() => (timesLeftClicked = 0), 200)
+  setTimeout(() => (timesRightClicked = 0), 200)
+
   // FALL THROUGH PLATFORM
   if (event.code === "ArrowDown") {
     downIsHeld = true
   }
+}
 }
 
 function keyupHandler(event) {
